@@ -7,5 +7,13 @@ const server = http.createServer((req, res) => {
 })
 
 const wss = new websocket.Server({ server })
-
+wss.on('headers', (headers, req) => {
+	console.log(headers)
+})
+wss.on('connection', (ws, req) => {
+	ws.send("Mera Websocket! ban gya bhaiii")
+	ws.on('message', (msg) => {
+		console.log(msg.toString())
+	})
+})
 server.listen(8000)
