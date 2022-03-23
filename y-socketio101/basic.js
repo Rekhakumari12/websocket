@@ -8,13 +8,18 @@ const server = http.createServer((req, res) => {
 	res.end("I am connect!")
 })
 
-const io = socketio(server)
+const io = socketio(server, {
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST"]
+	}
+})
 
 io.on('connection', (socket, req) => {
 	// ws.send -> socket.emit
-	socket.emit("Mera Websocket! ban gya bhaiii")
-	socket.on('mera event 😁', (msg) => {
-		console.log(msg.toString())
+	socket.emit('welcome', "server side se data aaya")
+	socket.on('message', (msg) => {
+		console.log(msg)
 	})
 })
-server.listen(8000)
+server.listen(5050)
