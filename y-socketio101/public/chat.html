@@ -3,11 +3,6 @@
 	const socket = io("http://localhost:5500");
 	socket.on("messageFromServer", (dataFromServer) => {
 		console.log(dataFromServer);
-<<<<<<< HEAD
-		console.log(dataFromServer, "(dataFromServer)");
-		console.log(dataFromServer, "(dataFromServer)2");
-=======
->>>>>>> parent of 9d855ca (add (dataFromServer))
 		socket.emit("messageToServer", { data: "This is from the client" });
 	});
 </script>
