@@ -11,9 +11,9 @@ const expressServer = app.listen(5500, () => {
 // socket server listening to http server
 const io = socketio(expressServer)
 
+// on - listening, emit - send
 io.on('connection', (socket) => {
-	socket.emit('messageFromServer', { data: 'This is from server' })
-	socket.on('messageToServer', (dataFromClient) => {
-		console.log(dataFromClient)
+	socket.on('messageFromClient', (data) => {
+		io.emit("messageToClients", { data: data.text })
 	})
 })
