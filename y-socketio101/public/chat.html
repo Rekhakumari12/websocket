@@ -4,6 +4,7 @@
 	socket.on("messageFromServer", (dataFromServer) => {
 		console.log(dataFromServer);
 		console.log(dataFromServer, "(dataFromServer)");
+		console.log(dataFromServer, "(dataFromServer)2");
 		socket.emit("messageToServer", { data: "This is from the client" });
 	});
 </script>
