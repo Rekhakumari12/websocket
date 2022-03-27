@@ -9,9 +9,10 @@ socket.on("nslist", (nsList) => {
 	nsList.forEach(element => {
 		namespacesDiv.innerHTML += `<div class="namespace" ns="${element.endpoint}"><img src="${element.img}"/></div>`
 	});
-	// add clickListner to each namespace
+	// add clickListner to each namespace, updating the DOM with NS
 	Array.from(document.getElementsByClassName('namespace')).forEach((e) => {
 		e.addEventListener('click', () => {
+			console.log(e)
 			let nsElement = e.getAttribute("ns")
 		})
 	})

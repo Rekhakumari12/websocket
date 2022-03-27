@@ -25,4 +25,12 @@ namespaces.forEach((namespace) => {
 	io.of(namespace.endpoint).on('connection', (socket) => {
 		console.log(`${socket.id} has joined ${namespace.endpoint}`)
 	})
-}) 
+})
+
+
+/*
+1. joined the main namespace
+2. sent back ns info to client
+3. listen for ns, updated the DOM
+
+ */
