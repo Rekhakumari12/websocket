@@ -1,19 +1,18 @@
 const socket = io("http://localhost:5500"); // redirect to / (default)endpoints 
-const socket1 = io("http://localhost:5500/admin"); // /admin namespace
-
-document.querySelector("#chat-form").addEventListener("submit", (e) => {
-	e.preventDefault();
-	const text = document.getElementById("user-message").value;
-	socket.emit("messageFromClient", { text });
-});
-
-socket1.on('adminMessage', (data) => {
-	console.log(data)
-})
-socket.on('joined', (d) => {
-	console.log(d)
-})
-socket.on("messageToClients", (dataFromServer) => {
-	socket.emit('')
-	document.getElementById("message").innerHTML += `<li>${dataFromServer.data}</li>`;
+const socket1 = io("http://localhost:5500/wiki"); // /admin namespace
+const socket2 = io("http://localhost:5500/mozilla"); // /mozila namespace
+const socket3 = io("http://localhost:5500/linux"); // /linux namespace
+// listen for ns which is a list of all namespaces
+socket.on("nslist", (nsList) => {
+	let namespacesDiv = document.querySelector('.namespaces')
+	namespacesDiv.innerHTML = ""
+	nsList.forEach(element => {
+		namespacesDiv.innerHTML += `<div class="namespace" ns="${element.endpoint}"><img src="${element.img}"/></div>`
+	});
+	// add clickListner to each namespace
+	Array.from(document.getElementsByClassName('namespace')).forEach((e) => {
+		e.addEventListener('click', () => {
+			let nsElement = e.getAttribute("ns")
+		})
+	})
 });
