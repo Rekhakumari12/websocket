@@ -17,13 +17,13 @@ io.on('connection', (socket) => {
 		}
 	})
 	// send the data back to client we need to use socket, NOT the io, because we want it to go to just this client
-	// console.log(nsData)
 	socket.emit('nslist', nsData)
 })
 // loop thru each namespace and listen to connection
 namespaces.forEach((namespace) => {
-	io.of(namespace.endpoint).on('connection', (socket) => {
-		console.log(`${socket.id} has joined ${namespace.endpoint}`)
+	io.of(namespace.endpoint).on('connection', (nsSocket) => {
+		nsSocket.emit('onRoomLoad', namespaces[0].room)
+		console.log(`${nsSocket.id} has joined ${namespace.endpoint}`)
 	})
 })
 
@@ -32,5 +32,4 @@ namespaces.forEach((namespace) => {
 1. joined the main namespace
 2. sent back ns info to client
 3. listen for ns, updated the DOM
-
  */
