@@ -19,11 +19,32 @@ io.on('connection', (socket) => {
 	// send the data back to client we need to use socket, NOT the io, because we want it to go to just this client
 	socket.emit('nslist', nsData)
 })
+
 // loop thru each namespace and listen to connection
 namespaces.forEach((namespace) => {
 	io.of(namespace.endpoint).on('connection', (nsSocket) => {
+
+		// a socket it connected to one of our chatgroup namespaces.
+		// send that namesapce group info back
+
 		nsSocket.emit('onRoomLoad', namespaces[0].room)
-		console.log(`${nsSocket.id} has joined ${namespace.endpoint}`)
+		nsSocket.on("joinRoom", async (roomName, numOfUserCallback) => {
+			// deal with history one we have it
+			nsSocket.join(roomName)
+
+			// io.of('/wiki').in(roomName).allSockets().then((clients) => {
+			// 	console.log(Array.from(clients)) // Set(1) { 'U0w2_wsx-KwqD0cGAAAE' } -> [ 'gHK4juEXcvNbJ9mAAAAB' ]
+			// 	console.log(Array.from(clients).length)
+			// })
+
+			// await version 
+			const clients = await io.of('/wiki').in(roomName).allSockets()
+			console.log(clients)
+			numOfUserCallback(Array.from(clients).length)
+		})
+
+		console.log(`${nsSocket.id} has joined ${namespace.endpoint} \n -----------------------------------`)
+
 	})
 })
 
@@ -32,4 +53,10 @@ namespaces.forEach((namespace) => {
 1. joined the main namespace
 2. sent back ns info to client
 3. listen for ns, updated the DOM
- */
+*/
+
+/*
+namespaces = [{Namespace, wiki}, {Namespace, mozilla}, {Namespace, firefox}]
+namesapces[0] = Namespace {id: 0, endpoint: '/wiki', room: [ [Room], [Room], [Room] ] },
+namespace[0].room = [ [Room, New Articles], [Room, Editors], [Room, Other] ]
+*/
