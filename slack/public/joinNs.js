@@ -22,4 +22,27 @@ const joinNs = (endpoint) => {
 		const topRoomName = topRoom.innerText
 		joinRoom(topRoomName)
 	})
+	nsSocket.on("messageToClient", msg => {
+		console.log(msg)
+		const newMsg = buildHtml(msg)
+		document.querySelector('#messages').innerHTML += newMsg
+	})
+	document.querySelector('.message-form').addEventListener('submit', (e) => {
+		e.preventDefault()
+		const userMessage = document.querySelector('#user-message').value
+		nsSocket.emit("newMessageToServer", { text: userMessage })
+	})
+}
+function buildHtml(msg) {
+	const convertedDate = new Date(msg.time).toLocaleString()
+	const newHtml = `<li>
+							<div class="user-image">
+								<img src="${msg.avatar}" />
+							</div>
+							<div class="user-message">
+								<div class="user-name-time">${msg.username}<span>${convertedDate}</span></div>
+								<div class="message-text">${msg.text}</div>
+							</div>
+						</li>`
+	return newHtml
 }

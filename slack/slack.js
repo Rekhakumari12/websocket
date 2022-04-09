@@ -31,20 +31,25 @@ namespaces.forEach((namespace) => {
 		nsSocket.on("joinRoom", async (roomName, numOfUserCallback) => {
 			// deal with history one we have it
 			nsSocket.join(roomName)
-
-			// io.of('/wiki').in(roomName).allSockets().then((clients) => {
-			// 	console.log(Array.from(clients)) // Set(1) { 'U0w2_wsx-KwqD0cGAAAE' } -> [ 'gHK4juEXcvNbJ9mAAAAB' ]
-			// 	console.log(Array.from(clients).length)
-			// })
-
-			// await version 
 			const clients = await io.of('/wiki').in(roomName).allSockets()
-			console.log(clients)
-			numOfUserCallback(Array.from(clients).length)
+			// send as ackowledgment to joinRoom event
+			await numOfUserCallback(Array.from(clients).length)
+			nsSocket.on("newMessageToServer", (msg) => {
+				const fullMsg = {
+					text: msg.text,
+					time: Date.now(),
+					username: 'rbunch',
+					avatar: 'https://via.placeholder.com/30'
+				}
+				console.log(fullMsg)
+				console.log(nsSocket.rooms) // Set(2) { 'yfhjkfH5hV9mGGrIAAAY', 'New Articles' }
+				const roomTitle = Array.from(nsSocket.rooms)[1]
+				io.of('/wiki').to(roomTitle).emit('messageToClient', fullMsg)
+
+			})
 		})
 
 		console.log(`${nsSocket.id} has joined ${namespace.endpoint} \n -----------------------------------`)
-
 	})
 })
 
@@ -60,3 +65,11 @@ namespaces = [{Namespace, wiki}, {Namespace, mozilla}, {Namespace, firefox}]
 namesapces[0] = Namespace {id: 0, endpoint: '/wiki', room: [ [Room], [Room], [Room] ] },
 namespace[0].room = [ [Room, New Articles], [Room, Editors], [Room, Other] ]
 */
+
+/*
+io.of('/wiki').in(roomName).allSockets().then((clients) => {
+	console.log(Array.from(clients)) // Set(1) { 'U0w2_wsx-KwqD0cGAAAE' } -> [ 'gHK4juEXcvNbJ9mAAAAB' ]
+	console.log(Array.from(clients).length)
+})
+*/
+
