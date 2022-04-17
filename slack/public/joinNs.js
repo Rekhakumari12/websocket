@@ -1,4 +1,10 @@
 const joinNs = (endpoint) => {
+	if (nsSocket) {
+		// check to see if socket is actualy a socket
+		nsSocket.close()
+		// remove the event listener before its added
+		document.querySelector('#user-input').removeEventListener('submit', formSubmission)
+	}
 	nsSocket = io(`http://localhost:5500${endpoint}`);
 
 	nsSocket.on('onRoomLoad', (nsRooms) => {
@@ -8,11 +14,12 @@ const joinNs = (endpoint) => {
 			const glyph = (!room.privateRoom) ? "globe" : "lock"
 			roomList.innerHTML += `<li class="room"><span class="glyphicon glyphicon-${glyph}"></span>${room.roomTitle}</li>`
 		});
-
+		// add click listner to each room
 		let roomNode = document.getElementsByClassName('room')
 		Array.from(roomNode).forEach(ele => {
 			ele.addEventListener('click', () => {
-				console.log('someone clicked', ele.innerText)
+				// console.log('someone clicked', ele.innerText)
+				joinRoom(ele.innerText)
 			})
 		})
 
@@ -27,12 +34,15 @@ const joinNs = (endpoint) => {
 		const newMsg = buildHtml(msg)
 		document.querySelector('#messages').innerHTML += newMsg
 	})
-	document.querySelector('.message-form').addEventListener('submit', (e) => {
-		e.preventDefault()
-		const userMessage = document.querySelector('#user-message').value
-		nsSocket.emit("newMessageToServer", { text: userMessage })
-	})
+	document.querySelector('.message-form').addEventListener('submit', formSubmission)
 }
+
+function formSubmission(e) {
+	e.preventDefault()
+	const userMessage = document.querySelector('#user-message').value
+	nsSocket.emit("newMessageToServer", { text: userMessage })
+}
+
 function buildHtml(msg) {
 	const convertedDate = new Date(msg.time).toLocaleString()
 	const newHtml = `<li>

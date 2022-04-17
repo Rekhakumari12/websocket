@@ -27,32 +27,42 @@ namespaces.forEach((namespace) => {
 		// a socket it connected to one of our chatgroup namespaces.
 		// send that namesapce group info back
 
-		nsSocket.emit('onRoomLoad', namespaces[0].room)
+		nsSocket.emit('onRoomLoad', namespace.room)
 		nsSocket.on("joinRoom", async (roomName, numOfUserCallback) => {
 			// deal with history one we have it
+			const roomToLeave = Array.from(nsSocket.rooms)[1]
+			nsSocket.leave(roomToLeave)
 			nsSocket.join(roomName)
-			const clients = await io.of('/wiki').in(roomName).allSockets()
-			// send as ackowledgment to joinRoom event
-			await numOfUserCallback(Array.from(clients).length)
-			nsSocket.on("newMessageToServer", (msg) => {
-				const fullMsg = {
-					text: msg.text,
-					time: Date.now(),
-					username: 'rbunch',
-					avatar: 'https://via.placeholder.com/30'
-				}
-				console.log(fullMsg)
-				console.log(nsSocket.rooms) // Set(2) { 'yfhjkfH5hV9mGGrIAAAY', 'New Articles' }
-				const roomTitle = Array.from(nsSocket.rooms)[1]
-				io.of('/wiki').to(roomTitle).emit('messageToClient', fullMsg)
-
-			})
+			updateUserInRoom(namespace, roomToLeave, numOfUserCallback)
+			// console.log(nsSocket.rooms) // Set(2) { 'yfhjkfH5hV9mGGrIAAAY', 'New Articles' }
+			const nsRoom = namespace.room.find(room => room.roomTitle === roomName)
+			nsSocket.emit('historyCatchUp', nsRoom.history)
+			updateUserInRoom(namespace, roomName, numOfUserCallback)
+			// console.log(nsRoom, "room joined----")
 		})
 
-		console.log(`${nsSocket.id} has joined ${namespace.endpoint} \n -----------------------------------`)
+		nsSocket.on("newMessageToServer", (msg) => {
+			const fullMsg = {
+				text: msg.text,
+				time: Date.now(),
+				username: 'rbunch',
+				avatar: 'https://via.placeholder.com/30'
+			}
+			const roomTitle = Array.from(nsSocket.rooms)[1]
+			const nsRoom = namespace.room.find(room => room.roomTitle === roomTitle)
+			nsRoom.addMessage(fullMsg)
+			io.of(namespace.endpoint).to(roomTitle).emit('messageToClient', fullMsg)
+		})
+
+		// console.log(`${nsSocket.id} has joined ${namespace.endpoint} Namespace \n -----------------------------------`)
 	})
 })
 
+async function updateUserInRoom(namespace, roomName, numOfUserCallback) {
+	const clients = await io.of(namespace.endpoint).in(roomName).allSockets()
+	// send as ackowledgment to joinRoom event
+	await numOfUserCallback(Array.from(clients).length)
+}
 
 /*
 1. joined the main namespace

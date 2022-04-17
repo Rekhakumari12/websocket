@@ -11,8 +11,8 @@ socket.on("nslist", (nsList) => {
 	// add clickListner to each namespace, updating the DOM with NS
 	Array.from(document.getElementsByClassName('namespace')).forEach((e) => {
 		e.addEventListener('click', () => {
-			let nsElement = e.getAttribute("ns")
-			console.log(nsElement)
+			let nsEndpoint = e.getAttribute("ns")
+			joinNs(nsEndpoint)
 		})
 	})
 	joinNs('/wiki')
